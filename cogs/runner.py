@@ -33,7 +33,7 @@ class Runner(commands.Cog):
     async def on_shell_error(self, command, response, errors):
         embed = discord.Embed(title=f"Errors for {command}", color=discord.Color.dark_red())
         embed.add_field(name="Output", value=response, inline=False)
-        embed.add_field(name="Errors", value=errors, inline=False)
+        embed.add_field(name="Errors", value=f"```{errors}```", inline=False)
         if not self.channel:
             self.channel = self.bot.get_channel(650896379178254346)
         return embed
