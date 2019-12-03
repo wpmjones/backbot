@@ -11,8 +11,8 @@ from loguru import logger
 from config import settings
 
 enviro = "home"
-token = settings['discord']['backbot_token']
-prefix = "b"
+token = settings['discord']['tubatime_token']
+prefix = "2ba."
 
 if enviro == "LIVE":
     coc_name = "war_vps"
@@ -22,7 +22,7 @@ else:
     coc_name = "war_dev"
 
 initial_extensions = ["cogs.admin",
-                      "cogs.warupdates",
+                      "cogs.runner",
                       ]
 
 coc_client = coc.login(settings['supercell']['user'],
@@ -48,7 +48,7 @@ class BackBot(commands.Bot):
                 traceback.print_exc()
 
     async def on_ready(self):
-        logger.info("backbot has started")
+        logger.info("Tuba Time has started")
 
     async def close(self):
         await super().close()

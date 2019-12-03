@@ -1,15 +1,6 @@
 import coc
-import asyncpg
-import asyncio
 
 from discord.ext import commands, tasks
-from loguru import logger
-from config import settings
-
-coc_client = coc.login(settings['supercell']['user'],
-                       settings['supercell']['pass'],
-                       key_names='war',
-                       correct_tags=True)
 
 
 class WarUpdates(commands.Cog):
@@ -38,7 +29,7 @@ class WarUpdates(commands.Cog):
                 sql = "UPDATE rcs_clans SET war_log_public = 0 WHERE clan_tag = $1"
                 await conn.execute(sql, tag)
                 continue
-            logger.info(f"Checking war log for: {tag}")
+            self.bot.logger.info(f"Checking war log for: {tag}")
             try:
                 print("start try")
                 for war in war_log:
@@ -60,7 +51,7 @@ class WarUpdates(commands.Cog):
             except:
                 self.bot.logger.exception("fail")
             # check for current war
-            logger.info(f"Checking current war for: {tag}")
+            self.bot.logger.info(f"Checking current war for: {tag}")
             war = await self.bot.coc.get_clan_war(tag)
             if war.state in ['preparation', 'inWar']:
                 opponent_name = war.opponent.name.replace("'", "''")

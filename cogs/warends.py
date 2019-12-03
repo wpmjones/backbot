@@ -1,18 +1,9 @@
 import coc
-import asyncpg
-import asyncio
 
 from discord.ext import commands, tasks
-from loguru import logger
-from config import settings
-
-coc_client = coc.login(settings['supercell']['user'],
-                       settings['supercell']['pass'],
-                       key_names='war',
-                       correct_tags=True)
 
 
-class WarUpdates(commands.Cog):
+class WarEnds(commands.Cog):
     """This class exists solely to pull the latest information from the API and
     update the database
     """
@@ -32,7 +23,7 @@ class WarUpdates(commands.Cog):
         fetch = await conn.fetch(sql)
         for row in fetch:
             tag = row[0]
-            logger.info(f"Checking for war end for: {tag}")
+            self.bot.logger.info(f"Checking for war end for: {tag}")
             try:
                 war = await self.bot.coc.get_clan_war(tag)
             except coc.PrivateWarLog:
@@ -53,10 +44,10 @@ class WarUpdates(commands.Cog):
                     self.bot.logger.exception("fail")
 
     @war_ends.before_loop
-    async def before_war_updates(self):
+    async def before_war_ends(self):
         await self.bot.wait_until_ready()
 
 
 def setup(bot):
-    bot.add_cog(WarUpdates(bot))
+    bot.add_cog(WarEnds(bot))
 
