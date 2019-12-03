@@ -11,11 +11,12 @@ class Runner(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.channel = None  # set in functions in case bot is not ready
-        # self.member_update.start()
+        self.logging = True
+        self.member_update.start()
         self.war_update.start()
 
     def cog_unload(self):
-        # self.member_update.cancel()
+        self.member_update.cancel()
         self.war_update.cancel()
 
     async def run_process(self, command=None):
@@ -38,14 +39,24 @@ class Runner(commands.Cog):
             self.channel = self.bot.get_channel(650896379178254346)
         return embed
 
-    @tasks.loop(minutes=15)
+    async def on_shell_success(self, command, response):
+        embed = discord.Embed(title=f"Output for {command}", color=discord.Color.dark_green())
+        embed.add_field(name="Output", value=response, inline=False)
+        if not self.channel:
+            self.channel = self.bot.get_channel(650896379178254346)
+        return embed
+
+    @tasks.loop(seconds=15)
     async def member_update(self):
         """Executes the rcsmembers.py command"""
         command = "rcsmembers.py"
         response, errors = await self.run_process(command)
         if errors:
             embed = await self.on_shell_error(command, response, errors)
-            await self.channel.send(embed=embed)
+            return await self.channel.send(embed=embed)
+        if self.logging:
+            embed = await self.on_shell_success(command, response)
+            return await self.channel.send(embed=embed)
 
     @member_update.before_loop
     async def before_member_update(self):
@@ -58,7 +69,10 @@ class Runner(commands.Cog):
         response, errors = await self.run_process(command)
         if errors:
             embed = await self.on_shell_error(command, response, errors)
-            await self.channel.send(embed=embed)
+            return await self.channel.send(embed=embed)
+        if self.logging:
+            embed = await self.on_shell_success(command, response)
+            return await self.channel.send(embed=embed)
 
     @war_update.before_loop
     async def before_war_update(self):
