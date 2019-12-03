@@ -11,11 +11,11 @@ class Runner(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.channel = None  # set in functions in case bot is not ready
-        self.member_update.start()
+        # self.member_update.start()
         self.war_update.start()
 
     def cog_unload(self):
-        self.member_update.cancel()
+        # self.member_update.cancel()
         self.war_update.cancel()
 
     async def run_process(self, command=None):
