@@ -1,3 +1,4 @@
+import discord
 import asyncio
 import subprocess
 
@@ -27,23 +28,24 @@ class Runner(commands.Cog):
             process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             result = await self.bot.loop.run_in_executor(None, process.communicate)
 
-        stdout, stderr = [output.decode() for output in result]
+        return [output.decode() for output in result]
 
-        if stderr:
-            text = f'Output:\n{stdout}\nErrors:\n{stderr}'
-        else:
-            text = stdout
-
-        return text
+    async def on_shell_error(self, command, response, errors):
+        embed = discord.Embed(title=f"Errors for {command}", color=discord.Color.dark_red())
+        embed.add_field(name="Output", value=response, inline=False)
+        embed.add_field(name="Errors", value=errors, inline=False)
+        if not self.channel:
+            self.channel = self.bot.get_channel(650896379178254346)
+        return embed
 
     @tasks.loop(minutes=15)
     async def member_update(self):
         """Executes the rcsmembers.py command"""
         command = "rcsmembers.py"
-        response = await self.run_process(command)
-        if not self.channel:
-            self.channel = self.bot.get_channel(650896379178254346)
-        await self.channel.send(f"```{response}```")
+        response, errors = await self.run_process(command)
+        if errors:
+            embed = await self.on_shell_error(command, response, errors)
+            await self.channel.send(embed=embed)
 
     @member_update.before_loop
     async def before_member_update(self):
@@ -53,10 +55,10 @@ class Runner(commands.Cog):
     async def war_update(self):
         """Executes the rcsmembers.py command"""
         command = "test.py"
-        response = await self.run_process(command)
-        if not self.channel:
-            self.channel = self.bot.get_channel(650896379178254346)
-        await self.channel.send(f"```{response}```")
+        response, errors = await self.run_process(command)
+        if errors:
+            embed = await self.on_shell_error(command, response, errors)
+            await self.channel.send(embed=embed)
 
     @war_update.before_loop
     async def before_war_update(self):
