@@ -14,14 +14,16 @@ class Runner(commands.Cog):
         self.logging = True
         self.member_update.start()
         self.war_update.start()
+        self.oak_google.start()
 
     def cog_unload(self):
         self.member_update.cancel()
         self.war_update.cancel()
+        self.oak_google.cancel()
 
     async def run_process(self, command=None):
         """Executes the actual shell process"""
-        command = f"python3 /home/pj/rcs/{command}"
+        command = f"python3 /home/tuba{command}"
         try:
             process = await asyncio.create_subprocess_shell(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             result = await process.communicate()
@@ -46,10 +48,10 @@ class Runner(commands.Cog):
             self.channel = self.bot.get_channel(650896379178254346)
         return embed
 
-    @tasks.loop(seconds=15)
+    @tasks.loop(minutes=20)
     async def member_update(self):
         """Executes the rcsmembers.py command"""
-        command = "rcsmembers.py"
+        command = "/rcs/rcsmembers.py"
         response, errors = await self.run_process(command)
         if errors:
             embed = await self.on_shell_error(command, response, errors)
@@ -62,10 +64,9 @@ class Runner(commands.Cog):
     async def before_member_update(self):
         await self.bot.wait_until_ready()
 
-    @tasks.loop(seconds=15)
+    @tasks.loop(minutes=10)
     async def war_update(self):
-        """Executes the rcsmembers.py command"""
-        command = "test.py"
+        command = "/rcs/warupdates.py"
         response, errors = await self.run_process(command)
         if errors:
             embed = await self.on_shell_error(command, response, errors)
@@ -76,6 +77,21 @@ class Runner(commands.Cog):
 
     @war_update.before_loop
     async def before_war_update(self):
+        await self.bot.wait_until_ready()
+
+    @tasks.loop(minutes=15)
+    async def oak_google(self):
+        command = "/coc/oak_google.py"
+        response, errors = await self.run_process(command)
+        if errors:
+            embed = await self.on_shell_error(command, response, errors)
+            return await self.channel.send(embed=embed)
+        if self.logging:
+            embed = await self.on_shell_success(command, response)
+            return await self.channel.send(embed=embed)
+
+    @oak_google.before_loop
+    async def oak_google_update(self):
         await self.bot.wait_until_ready()
 
 

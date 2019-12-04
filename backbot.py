@@ -10,12 +10,12 @@ from cogs.utils.db import Psql
 from loguru import logger
 from config import settings
 
-enviro = "home"
+enviro = "LIVE"
 token = settings['discord']['tubatime_token']
 prefix = "2ba."
 
 if enviro == "LIVE":
-    coc_name = "war_vps"
+    coc_name = "war"
 elif enviro == "home":
     coc_name = "war_home"
 else:
