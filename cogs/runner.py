@@ -11,7 +11,7 @@ class Runner(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.channel = None  # set in functions in case bot is not ready
-        self.logging = True
+        self.logging = False
         self.member_update.start()
         self.war_update.start()
         self.oak_google.start()
