@@ -11,7 +11,7 @@ class Runner(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.channel = None  # set in functions in case bot is not ready
-        self.logging = False
+        self.logging = True
         self.member_update.start()
         self.war_update.start()
         self.oak_google.start()
@@ -53,7 +53,7 @@ class Runner(commands.Cog):
         """Executes the rcsmembers.py command"""
         command = "/rcs/rcsmembers.py"
         response, errors = await self.run_process(command)
-        if errors:
+        if errors and "collections.abc" not in errors:
             embed = await self.on_shell_error(command, response, errors)
             return await self.channel.send(embed=embed)
         if self.logging:
@@ -93,6 +93,11 @@ class Runner(commands.Cog):
     @oak_google.before_loop
     async def oak_google_update(self):
         await self.bot.wait_until_ready()
+
+    @commands.command()
+    async def flip(self, ctx):
+        self.logging = not self.logging
+        await ctx.send(f"Logging is now set to {self.logging}.")
 
 
 def setup(bot):
