@@ -15,7 +15,7 @@ class Runner(commands.Cog):
         self.member_update.start()
         self.war_update.start()
         self.oak_google.start()
-        self.rcs_wiki_update()
+        self.rcs_wiki_update.start()
 
     def cog_unload(self):
         self.member_update.cancel()
