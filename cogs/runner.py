@@ -79,6 +79,21 @@ class Runner(commands.Cog):
     async def before_war_update(self):
         await self.bot.wait_until_ready()
 
+    @tasks.loop(hours=1)
+    async def rcs_wiki_update(self):
+        command = "/rcs/rcslist.py"
+        response, errors = await self.run_process(command)
+        if errors:
+            embed = await self.on_shell_error(command, response, errors)
+            return await self.channel.send(embed=embed)
+        if self.logging:
+            embed = await self.on_shell_success(command, response)
+            return await self.channel.send(embed=embed)
+
+    @rcs_wiki_update.before_loop
+    async def before_rcs_wiki_update(self):
+        await self.bot.wait_until_ready()
+
     @tasks.loop(minutes=15)
     async def oak_google(self):
         command = "/coc/oak_google.py"
