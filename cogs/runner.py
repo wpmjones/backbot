@@ -83,7 +83,7 @@ class Runner(commands.Cog):
     async def rcs_wiki_update(self):
         command = "/rcs/rcslist.py"
         response, errors = await self.run_process(command)
-        if errors:
+        if errors and "collections.abc" not in errors:
             embed = await self.on_shell_error(command, response, errors)
             return await self.channel.send(embed=embed)
         if self.logging:
