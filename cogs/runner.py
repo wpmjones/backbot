@@ -15,11 +15,13 @@ class Runner(commands.Cog):
         self.member_update.start()
         self.war_update.start()
         self.oak_google.start()
+        self.rcs_wiki_update()
 
     def cog_unload(self):
         self.member_update.cancel()
         self.war_update.cancel()
         self.oak_google.cancel()
+        self.rcs_wiki_update.cancel()
 
     async def run_process(self, command=None):
         """Executes the actual shell process"""
