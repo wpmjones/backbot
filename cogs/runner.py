@@ -25,7 +25,7 @@ class Runner(commands.Cog):
 
     async def run_process(self, command=None):
         """Executes the actual shell process"""
-        command = f"python3 /home/tuba{command}"
+        command = f"python3 -W ignore::DeprecationWarning /home/tuba{command}"
         try:
             process = await asyncio.create_subprocess_shell(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             result = await process.communicate()
@@ -55,7 +55,7 @@ class Runner(commands.Cog):
         """Executes the rcsmembers.py command"""
         command = "/rcs/rcsmembers.py"
         response, errors = await self.run_process(command)
-        if errors and "collections.abc" not in errors:
+        if errors:
             embed = await self.on_shell_error(command, response, errors)
             return await self.channel.send(embed=embed)
         if self.logging:
@@ -85,7 +85,7 @@ class Runner(commands.Cog):
     async def rcs_wiki_update(self):
         command = "/rcs/rcslist.py"
         response, errors = await self.run_process(command)
-        if errors and "collections.abc" not in errors:
+        if errors:
             embed = await self.on_shell_error(command, response, errors)
             return await self.channel.send(embed=embed)
         if self.logging:
