@@ -38,14 +38,14 @@ class Runner(commands.Cog):
     async def on_shell_error(self, command, response, errors):
         embed = discord.Embed(title=f"Errors for {command}", color=discord.Color.dark_red())
         embed.add_field(name="Output", value=response, inline=False)
-        embed.add_field(name="Errors", value=f"```{errors}```", inline=False)
+        embed.add_field(name="Errors", value=f"```{errors[:1990]}```", inline=False)
         if not self.channel:
             self.channel = self.bot.get_channel(650896379178254346)
         return embed
 
     async def on_shell_success(self, command, response):
         embed = discord.Embed(title=f"Output for {command}", color=discord.Color.dark_green())
-        embed.add_field(name="Output", value=response, inline=False)
+        embed.add_field(name="Output", value=response[:1995], inline=False)
         if not self.channel:
             self.channel = self.bot.get_channel(650896379178254346)
         return embed
@@ -69,7 +69,11 @@ class Runner(commands.Cog):
     @tasks.loop(minutes=10)
     async def war_update(self):
         command = "/rcs/warupdates.py"
-        response, errors = await self.run_process(command)
+        try:
+            response, errors = await self.run_process(command)
+        except:
+            self.bot.logger.exception("war_udpate failed")
+            return
         if errors:
             embed = await self.on_shell_error(command, response, errors)
             return await self.channel.send(embed=embed)
