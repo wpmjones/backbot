@@ -3,6 +3,7 @@ import asyncio
 import subprocess
 
 from discord.ext import commands, tasks
+from datetime import date
 
 
 class Runner(commands.Cog):
@@ -17,6 +18,7 @@ class Runner(commands.Cog):
         self.war_report.start()
         self.oak_google.start()
         self.rcs_wiki_update.start()
+        self.rcs_location_check.start()
 
     def cog_unload(self):
         self.member_update.cancel()
@@ -24,6 +26,7 @@ class Runner(commands.Cog):
         self.war_report.cancel()
         self.oak_google.cancel()
         self.rcs_wiki_update.cancel()
+        self.rcs_location_check.cancel()
 
     async def run_process(self, command=None):
         """Executes the actual shell process"""
@@ -115,6 +118,25 @@ class Runner(commands.Cog):
 
     @rcs_wiki_update.before_loop
     async def before_rcs_wiki_update(self):
+        await self.bot.wait_until_ready()
+
+    @tasks.loop(hours=24)
+    async def rcs_location_check(self):
+        # Only run on Wednesday
+        if date.today().weekday() == 2:
+            command = "/rcs/loccheck.py"
+            response, errors = await self.run_process(command)
+            if errors:
+                embed = await self.on_shell_error(command, response, errors)
+                return await self.channel.send(embed=embed)
+            if self.logging:
+                embed = await self.on_shell_success(command, response)
+                return await self.channel.send(embed=embed)
+        else:
+            await self.channel.send("Skipping rcs_location_check. Today is not Wednesday.")
+
+    @rcs_location_check.before_loop
+    async def before_rcs_location_check(self):
         await self.bot.wait_until_ready()
 
     @tasks.loop(minutes=15)
