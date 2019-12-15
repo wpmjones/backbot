@@ -73,7 +73,7 @@ class Runner(commands.Cog):
     async def before_member_update(self):
         await self.bot.wait_until_ready()
 
-    @tasks.loop(minutes=10)
+    @tasks.loop(minutes=2)
     async def war_update(self):
         command = "/rcs/warupdates.py"
         try:
@@ -92,7 +92,7 @@ class Runner(commands.Cog):
     async def before_war_update(self):
         await self.bot.wait_until_ready()
 
-    @tasks.loop(minutes=10)
+    @tasks.loop(minutes=15)
     async def war_report(self):
         command = "/rcs/warreport.py"
         response, errors = await self.run_process(command)
