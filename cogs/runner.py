@@ -15,7 +15,7 @@ class Runner(commands.Cog):
         self.logging = True
         self.member_update.start()
         self.war_update.start()
-        self.war_report.start()
+        # self.war_report.start()
         self.oak_google.start()
         self.rcs_wiki_update.start()
         self.rcs_location_check.start()
@@ -23,7 +23,7 @@ class Runner(commands.Cog):
     def cog_unload(self):
         self.member_update.cancel()
         self.war_update.cancel()
-        self.war_report.cancel()
+        # self.war_report.cancel()
         self.oak_google.cancel()
         self.rcs_wiki_update.cancel()
         self.rcs_location_check.cancel()
@@ -92,20 +92,20 @@ class Runner(commands.Cog):
     async def before_war_update(self):
         await self.bot.wait_until_ready()
 
-    @tasks.loop(minutes=15)
-    async def war_report(self):
-        command = "/rcs/warreport.py"
-        response, errors = await self.run_process(command)
-        if errors:
-            embed = await self.on_shell_error(command, response, errors)
-            return await self.channel.send(embed=embed)
-        if self.logging:
-            embed = await self.on_shell_success(command, response)
-            return await self.channel.send(embed=embed)
-
-    @war_report.before_loop
-    async def before_war_report(self):
-        await self.bot.wait_until_ready()
+    # @tasks.loop(minutes=15)
+    # async def war_report(self):
+    #     command = "/rcs/warreport.py"
+    #     response, errors = await self.run_process(command)
+    #     if errors:
+    #         embed = await self.on_shell_error(command, response, errors)
+    #         return await self.channel.send(embed=embed)
+    #     if self.logging:
+    #         embed = await self.on_shell_success(command, response)
+    #         return await self.channel.send(embed=embed)
+    #
+    # @war_report.before_loop
+    # async def before_war_report(self):
+    #     await self.bot.wait_until_ready()
 
     @tasks.loop(hours=1)
     async def rcs_wiki_update(self):

@@ -23,6 +23,7 @@ else:
 
 initial_extensions = ["cogs.admin",
                       "cogs.runner",
+                      "cogs.warreport",
                       ]
 
 coc_client = coc.login(settings['supercell']['user'],
