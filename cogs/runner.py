@@ -73,7 +73,7 @@ class Runner(commands.Cog):
     async def before_member_update(self):
         await self.bot.wait_until_ready()
 
-    @tasks.loop(minutes=2)
+    @tasks.loop(minutes=3)
     async def war_update(self):
         command = "/rcs/warupdates.py"
         try:
