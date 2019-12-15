@@ -135,6 +135,8 @@ class Runner(commands.Cog):
                 embed = await self.on_shell_success(command, response)
                 return await self.channel.send(embed=embed)
         else:
+            if not self.channel:
+                self.channel = self.bot.get_channel(650896379178254346)
             await self.channel.send("Skipping rcs_location_check. Today is not Wednesday.")
 
     @rcs_location_check.before_loop
