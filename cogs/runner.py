@@ -3,7 +3,7 @@ import asyncio
 import subprocess
 
 from discord.ext import commands, tasks
-from datetime import date, datetime
+from datetime import date, datetime, time
 
 
 class Runner(commands.Cog):
@@ -15,18 +15,18 @@ class Runner(commands.Cog):
         self.logging = True
         self.member_update.start()
         self.war_update.start()
-        # self.war_report.start()
         self.oak_google.start()
         self.rcs_wiki_update.start()
         self.rcs_location_check.start()
+        self.sql_check.start()
 
     def cog_unload(self):
         self.member_update.cancel()
         self.war_update.cancel()
-        # self.war_report.cancel()
         self.oak_google.cancel()
         self.rcs_wiki_update.cancel()
         self.rcs_location_check.cancel()
+        self.sql_check.cancel()
 
     async def run_process(self, command=None):
         """Executes the actual shell process"""
@@ -92,21 +92,6 @@ class Runner(commands.Cog):
     async def before_war_update(self):
         await self.bot.wait_until_ready()
 
-    # @tasks.loop(minutes=15)
-    # async def war_report(self):
-    #     command = "/rcs/warreport.py"
-    #     response, errors = await self.run_process(command)
-    #     if errors:
-    #         embed = await self.on_shell_error(command, response, errors)
-    #         return await self.channel.send(embed=embed)
-    #     if self.logging:
-    #         embed = await self.on_shell_success(command, response)
-    #         return await self.channel.send(embed=embed)
-    #
-    # @war_report.before_loop
-    # async def before_war_report(self):
-    #     await self.bot.wait_until_ready()
-
     @tasks.loop(hours=1)
     async def rcs_wiki_update(self):
         command = "/rcs/rcslist.py"
@@ -155,7 +140,22 @@ class Runner(commands.Cog):
             return await self.channel.send(embed=embed)
 
     @oak_google.before_loop
-    async def oak_google_update(self):
+    async def before_oak_google(self):
+        await self.bot.wait_until_ready()
+
+    @tasks.loop(time=time(hour=3, minute=0))
+    async def sql_check(self):
+        command = "/coc/sqlcheck.py"
+        response, errors = await self.run_process(command)
+        if errors:
+            embed = await self.on_shell_error(command, response, errors)
+            return await self.channel.send(embed=embed)
+        if self.logging:
+            embed = await self.on_shell_success(command, response)
+            return await self.channel.send(embed=embed)
+
+    @sql_check.before_loop
+    async def before_sql_check(self):
         await self.bot.wait_until_ready()
 
     @commands.command()
