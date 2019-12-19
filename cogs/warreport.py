@@ -52,7 +52,6 @@ class Runner(commands.Cog):
         command = "/rcs/warreport.py"
         if not self.channel:
             self.channel = self.bot.get_channel(650896379178254346)
-        await self.channel.send(f"Attempting {command}")
         response, errors = await self.run_process(command)
         if errors:
             embed = await self.on_shell_error(command, response, errors)
