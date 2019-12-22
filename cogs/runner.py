@@ -19,6 +19,7 @@ class Runner(commands.Cog):
         self.rcs_wiki_update.start()
         self.rcs_location_check.start()
         self.sql_check.start()
+        self.sql_psql.start()
 
     def cog_unload(self):
         self.member_update.cancel()
@@ -27,6 +28,7 @@ class Runner(commands.Cog):
         self.rcs_wiki_update.cancel()
         self.rcs_location_check.cancel()
         self.sql_check.cancel()
+        self.sql_psql.cancel()
 
     async def run_process(self, command=None):
         """Executes the actual shell process"""
@@ -145,7 +147,7 @@ class Runner(commands.Cog):
 
     @tasks.loop(time=time(hour=3, minute=0))
     async def sql_check(self):
-        command = "/coc/sqlcheck.py"
+        command = "/rcs/sqlcheck.py"
         response, errors = await self.run_process(command)
         if errors:
             embed = await self.on_shell_error(command, response, errors)
@@ -156,6 +158,21 @@ class Runner(commands.Cog):
 
     @sql_check.before_loop
     async def before_sql_check(self):
+        await self.bot.wait_until_ready()
+
+    @tasks.loop(hours=1)
+    async def sql_psql(self):
+        command = "/rcs/sql2psql.py"
+        response, errors = await self.run_process(command)
+        if errors:
+            embed = await self.on_shell_error(command, response, errors)
+            return await self.channel.send(embed=embed)
+        if self.logging:
+            embed = await self.on_shell_success(command, response)
+            return await self.channel.send(embed=embed)
+
+    @sql_psql.before_loop
+    async def before_sql_psql(self):
         await self.bot.wait_until_ready()
 
     @commands.command()
