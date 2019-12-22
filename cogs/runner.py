@@ -177,7 +177,7 @@ class Runner(commands.Cog):
 
     @commands.command()
     async def execute(self, ctx, func):
-        await ctx.invoke(func)
+        await ctx.invoke(f"self.{func}")
 
     @commands.command()
     async def flip(self, ctx):
