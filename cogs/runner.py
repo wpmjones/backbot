@@ -176,6 +176,10 @@ class Runner(commands.Cog):
         await self.bot.wait_until_ready()
 
     @commands.command()
+    async def execute(self, ctx, func):
+        await ctx.invoke(func)
+
+    @commands.command()
     async def flip(self, ctx):
         self.logging = not self.logging
         await ctx.send(f"Logging is now set to {self.logging}.")
