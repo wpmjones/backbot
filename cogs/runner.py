@@ -98,9 +98,6 @@ class Runner(commands.Cog):
     async def rcs_wiki_update(self):
         command = "/rcs/rcslist.py"
         response, errors = await self.run_process(command)
-        sql = ("INSERT INTO rcs_task_log (log_type_id, log_date) "
-               "VALUES ($1, $2)")
-        await self.bot.pool.execute(sql, 5, date.today())
         if errors:
             embed = await self.on_shell_error(command, response, errors)
             return await self.channel.send(embed=embed)
