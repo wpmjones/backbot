@@ -98,6 +98,9 @@ class Runner(commands.Cog):
     async def rcs_wiki_update(self):
         command = "/rcs/rcslist.py"
         response, errors = await self.run_process(command)
+        sql = ("INSERT INTO rcs_task_log (log_type_id, log_date) "
+               "VALUES ($1, $2)")
+        await self.bot.pool.execute(sql, 5, date.today())
         if errors:
             embed = await self.on_shell_error(command, response, errors)
             return await self.channel.send(embed=embed)
@@ -109,7 +112,7 @@ class Runner(commands.Cog):
     async def before_rcs_wiki_update(self):
         await self.bot.wait_until_ready()
 
-    @tasks.loop(hours=24)
+    @tasks.loop(time=time(hour=17, minute=0))
     async def rcs_location_check(self):
         # Only run on Wednesday
         if date.today().weekday() == 2:
