@@ -3,6 +3,8 @@ import asyncio
 import subprocess
 
 from discord.ext import commands, tasks
+from cogs.utils.db import Psql
+from cogs.utils.constants import log_types
 from datetime import date, datetime, time
 
 
@@ -111,10 +113,13 @@ class Runner(commands.Cog):
 
     @tasks.loop(time=time(hour=17, minute=0))
     async def rcs_location_check(self):
-        # Only run on Wednesday
-        if date.today().weekday() == 2:
+        sql = "SELECT log_date FROM rcs_task_log WHERE log_type_id = 7 ORDER BY log_date DESC LIMIT 1"
+        fetch = await self.bot.pool.fetchrow(sql)
+        # Only run on Wednesday and only if you haven't already run today
+        if fetch['log_date'] < date.today() and date.today().weekday() == 2:
             command = "/rcs/loccheck.py"
             response, errors = await self.run_process(command)
+            await Psql(self.bot).add_log(log_types['loc_check'])
             if errors:
                 embed = await self.on_shell_error(command, response, errors)
                 return await self.channel.send(embed=embed)

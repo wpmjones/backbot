@@ -1,6 +1,7 @@
 import asyncpg
 import pymssql
 
+from datetime import date
 from config import settings
 
 
@@ -34,3 +35,8 @@ class Psql:
         conn = self.bot.pool
         sql = "SELECT clan_name, clan_tag FROM rcs_clans ORDER BY clan_name"
         return await conn.fetch(sql)
+
+    async def add_log(self, log_type_id, notes = None):
+        sql = ("INSERT INTO rcs_task_log (log_type_id, log_date, argument) "
+               "VALUES ($1, $2, $3)")
+        await self.bot.pool.execute(sql, log_type_id, date.today(), notes)
