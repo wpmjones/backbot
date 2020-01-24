@@ -168,6 +168,7 @@ class Runner(commands.Cog):
     @tasks.loop(hours=1)
     async def sql_psql(self):
         command = "/rcs/sql2psql.py"
+        print(f"trying {command}")
         response, errors = await self.run_process(command)
         if errors:
             embed = await self.on_shell_error(command, response, errors)
